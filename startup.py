@@ -125,6 +125,64 @@ def load_overall_analysis():
 
         st.pyplot(fig12)
 
+    st.header("Top Investor on the Two Basis")
+    col1, col2 = st.columns(2)
+    with col1:
+
+        investor_count = df.groupby('investors')['startup'].count().sort_values(ascending=False).head(10)
+        st.subheader('Top investors basic of numbers')
+        fig12, ax12 = plt.subplots(figsize=(15, 9))
+        ax12.bar(investor_count.index, investor_count.values)
+        ax12.set_xlabel('investor name')
+        ax12.set_ylabel('no of startups invest')
+
+        plt.xticks(rotation=45, ha='right')
+        plt.tight_layout()
+
+        st.pyplot(fig12)
+
+    with col2:
+
+        investor_sum = df.groupby('investors')['amount'].sum().sort_values(ascending=False).head(10)
+        st.subheader('Top investors basic on the amount')
+        fig12, ax12 = plt.subplots(figsize=(15, 9))
+        ax12.bar(investor_sum.index, investor_sum.values)
+        ax12.set_xlabel('investor name')
+        ax12.set_ylabel('Amount invest in startups')
+
+        plt.xticks(rotation=45, ha='right')
+        plt.tight_layout()
+
+        st.pyplot(fig12)
+
+    st.header('Top startups Year wise')
+    selected_year = st.selectbox('select Type', [2015,2016,2017,2018,2019,2020])
+    st.subheader('for find top 5 best startups')
+    def year_best_st(selected_year):
+        year_wise_best =  df[df['year'] == selected_year][['startup', 'amount']].sort_values(by='amount', ascending=False).head(10)
+
+        return st.dataframe(year_wise_best)
+    year_best_st(selected_year)
+
+    st.subheader('all money invest in this year')
+
+    def year_best_st1(selected_year):
+        Total_amount = round(df[df['year'] == selected_year][['startup', 'amount']]['amount'].sum())
+        return st.metric('Total Amount', str(Total_amount) + 'cr')
+    year_best_st1(selected_year)
+
+def load_startup_details(startup):
+    st.title(startup)
+    last5_df = df[df['startup'].str.contains(startup)].head()[
+        ['startup', 'vertical','subvertical', 'city', 'round','date','investors','amount']]
+    st.subheader('startup detials')
+    st.dataframe(last5_df)
+
+    st.header('Simailar Compaies basic on city')
+
+
+
+
 def load_investor_details(investor):
     st.title(investor)
     #load the recent 5 investments of the investor
@@ -186,14 +244,18 @@ if option == 'overall Analysis':
     load_overall_analysis()
 
 elif option == 'Startup':
-    st.sidebar.selectbox('Select startup',df['startup'].unique().tolist())
+    selected_startup = st.sidebar.selectbox('Select startup',df['startup'].unique().tolist())
     btn1 = st.sidebar.button('startup details')
     st.title('startup Analysis')
+    if btn1:
+        load_startup_details(selected_startup)
 elif option == 'Investor':
     selected_investor = st.sidebar.selectbox('select investor',sorted(set(df['investors'].str.split(',').sum())))
     btn2 = st.sidebar.button('Find Invertors details')
     if btn2:
         load_investor_details(selected_investor)
+
+
 
 
 
