@@ -1,4 +1,6 @@
 import streamlit as st
+if "show_details" not in st.session_state:
+    st.session_state.show_details = False
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -178,9 +180,33 @@ def load_startup_details(startup):
     st.subheader('startup detials')
     st.dataframe(last5_df)
 
-    st.header('Simailar Compaies basic on city')
+    st.header('similar companies')
+    option1 = st.selectbox('select one',['city','amount'])
+
+    if option1 == 'city':
+        selected_city = st.selectbox('select one city', sorted(df['city'].unique().tolist()))
+        load_similar_city(selected_city)
+
+    if option1 == 'amount':
+        st.title('similar company basis on amount')
+        range_amount = st.selectbox('select one range',['1-5','5-20','20-100','100-1000'])
+        lower_range_amount = int(range_amount.split('-')[0])
+        upper_range_amount = int(range_amount.split('-')[1])
+        load_amount_basis(lower_range_amount,upper_range_amount)
 
 
+def load_amount_basis(lower_range_amount,upper_range_amount):
+    st.subheader('similar companies')
+    load5 = df[(df['amount'] >= lower_range_amount) & (df['amount'] <= upper_range_amount)][['date', 'startup', 'vertical', 'city', 'investors', 'round', 'amount']].head(5)
+    st.dataframe(load5)
+
+
+
+def load_similar_city(city):
+    st.title(city)
+    st.subheader('similar companies')
+    load_5 = df[df['city'].str.contains(city)].head(5)[['round', 'amount', 'startup', 'date', 'investors', 'vertical']]
+    st.dataframe(load_5)
 
 
 def load_investor_details(investor):
@@ -248,12 +274,20 @@ elif option == 'Startup':
     btn1 = st.sidebar.button('startup details')
     st.title('startup Analysis')
     if btn1:
+        st.session_state.show_details = True
+
+    if st.session_state.show_details:
+        st.subheader('startup details')
         load_startup_details(selected_startup)
+
+
+
 elif option == 'Investor':
     selected_investor = st.sidebar.selectbox('select investor',sorted(set(df['investors'].str.split(',').sum())))
     btn2 = st.sidebar.button('Find Invertors details')
     if btn2:
         load_investor_details(selected_investor)
+
 
 
 
