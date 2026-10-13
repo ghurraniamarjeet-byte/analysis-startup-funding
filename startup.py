@@ -7,20 +7,20 @@ import matplotlib.pyplot as plt
 
 df = pd.read_csv("startup_cleaned.csv")
 df['date'] = pd.to_datetime(df['date'],errors='coerce')
-st.sidebar.title('Startup Funding Analysis')
+st.sidebar.title('Startup Funding Analysis 2015 to 2020')
 
 def load_overall_analysis():
-    st.title('Overall Analysis')
+    st.title('Overall Analysis 2015 to 2020')
     col1,col2,col3,col4 = st.columns(4)
     #total investested money till in indian startups
     with col1:
         total_amount = round(df['amount'].sum())
-        st.metric('Total Amount', str(total_amount) + 'cr')
+        st.metric('Total Amount Invested', str(total_amount) + 'cr')
 
     #maximum investment
     with col2:
         max_investment = round(df['amount'].max())
-        st.metric('Max Investment', str(max_investment) + 'cr')
+        st.metric('Max Investment Amount', str(max_investment) + 'cr')
 
     #for average
     with col3:
@@ -33,17 +33,21 @@ def load_overall_analysis():
 
     df['month'] = df['date'].dt.month
     df['year'] = df['date'].dt.year
-    st.header('MOM graph')
-    selected_option = st.selectbox('select Type',['Total','Count'])
-    if selected_option == 'Total':
+    st.header('MOM(month on month) graph')
+    selected_option = st.selectbox('select one',['Total Amount invested','No of startups Count'])
+    if selected_option == 'Total Amount invested':
 
         temp_df = df.groupby(['month','year'])['amount'].sum().reset_index()
         temp_df['x_axis'] = temp_df['month'].astype('str') + '-' + temp_df['year'].astype('str')
 
-        fig5, ax5 = plt.subplots()
+        fig5, ax5 = plt.subplots(figsize=(15,7))
         ax5.plot(temp_df['x_axis'],temp_df['amount'])
 
+        ax5.tick_params(axis='x', labelrotation=55)
+        fig5.tight_layout()
+
         st.pyplot(fig5)
+        plt.close(fig5)
     else :
         temp_df = df.groupby(['month', 'year'])['amount'].count().reset_index()
         temp_df['x_axis'] = temp_df['month'].astype('str') + '-' + temp_df['year'].astype('str')
