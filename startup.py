@@ -1,6 +1,7 @@
 import streamlit as st
 if "show_details" not in st.session_state:
     st.session_state.show_details = False
+st.set_page_config(layout="wide")
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -35,10 +36,11 @@ def load_overall_analysis():
     df['year'] = df['date'].dt.year
     st.header('MOM(month on month) graph')
     selected_option = st.selectbox('select one',['Total Amount invested','No of startups Count'])
-    if selected_option == 'Total Amount invested':
 
-        temp_df = df.groupby(['month','year'])['amount'].sum().reset_index()
-        temp_df['x_axis'] = temp_df['month'].astype('str') + '-' + temp_df['year'].astype('str')
+    if selected_option == 'Total Amount invested':
+        temp_df = df.groupby(['month', 'year'])['amount'].sum().reset_index().set_index('year').sort_index(
+            ascending=True)
+        temp_df['x_axis'] = temp_df['month'].astype('str') + '-' + temp_df.index.astype('str')
 
         fig5, ax5 = plt.subplots(figsize=(15,7))
         ax5.plot(temp_df['x_axis'],temp_df['amount'])
@@ -48,18 +50,26 @@ def load_overall_analysis():
 
         st.pyplot(fig5)
         plt.close(fig5)
+        # for show Bar chart to show information
+        st.markdown("<h2 style='text-align:center;'>Sector-Wise Startup & Funding Insights</h2",unsafe_allow_html=True)
     else :
-        temp_df = df.groupby(['month', 'year'])['amount'].count().reset_index()
-        temp_df['x_axis'] = temp_df['month'].astype('str') + '-' + temp_df['year'].astype('str')
+        temp_df = df.groupby(['month', 'year'])['amount'].count().reset_index().set_index('year').sort_index(
+            ascending=True)
+        temp_df['x_axis'] = temp_df['month'].astype('str') + '-' + temp_df.index.astype('str')
 
-        fig6, ax6 = plt.subplots()
+        fig6,ax6 =plt.subplots(figsize=(15,7))
         ax6.plot(temp_df['x_axis'], temp_df['amount'])
 
+        ax6.tick_params(axis='x', labelrotation=55)
+        fig6.tight_layout()
+
         st.pyplot(fig6)
+        plt.close(fig6)
     col1, col2 = st.columns(2)
+
     with col1:
         top_sector = df.groupby('vertical')['amount'].count().sort_values(ascending=False).head()
-        st.subheader('top five most no of startups sectors in pie chart')
+        st.subheader('Top 5 startups by Funding Rounds')
 
         fig7, ax7 = plt.subplots()
         ax7.pie(top_sector, labels=top_sector.index, autopct='%1.1f%%')
