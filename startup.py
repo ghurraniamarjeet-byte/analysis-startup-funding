@@ -68,119 +68,120 @@ def load_overall_analysis():
     col1, col2 = st.columns(2)
 
     with col1:
+
         top_sector = df.groupby('vertical')['amount'].count().sort_values(ascending=False).head()
-        st.subheader('Top 5 startups by Funding Rounds')
+        st.subheader('Top 5 Sectors by Startup Count')
 
-        fig7, ax7 = plt.subplots()
-        ax7.pie(top_sector, labels=top_sector.index, autopct='%1.1f%%')
 
-        st.pyplot(fig7)
+        fig7, ax7 = plt.subplots(figsize= (6,5))
+        ax7.pie(top_sector, labels=top_sector.index, autopct='%1.1f%%',radius=0.85,startangle=90)
+        ax7.set_aspect('equal')
+        st.pyplot(fig7,use_container_width=True)
+
 
     with col2:
         top_sector1 = df.groupby('vertical')['amount'].sum().sort_values(ascending=False).head()
-        st.subheader('top five most valuable sectors in pie chart')
+        st.subheader('Top 5 Sector by Total Funding')
 
-        fig8, ax8 = plt.subplots()
-        ax8.pie(top_sector1, labels=top_sector1.index, autopct='%1.1f%%')
+        fig8, ax8 = plt.subplots(figsize= (6,5))
+        ax8.pie(top_sector1, labels=top_sector1.index, autopct='%1.1f%%',radius = 0.85,startangle= 90)
+        ax8.set_aspect('equal')
+        st.pyplot(fig8,use_container_width=True)
+    st.header('Funding Analysis')
+    st.subheader('Explore the most popular funding types and investment distribution')
 
-        st.pyplot(fig8)
-    st.header('Types of Funding Basic on Money and how many startups')
+    rounds_count = df.groupby('round')['vertical'].count().sort_values(ascending=False).head(10)
+    st.subheader('Most Popular Funding Types')
+    fig9, ax9 = plt.subplots(figsize =(15,9))
+    ax9.barh(rounds_count.index, rounds_count.values,color='pink')
+    ax9.set_xlabel('Funding Types')
+    ax9.set_ylabel('Number of startups')
 
-    col1, col2 = st.columns(2)
-    with col1:
-        rounds_count = df.groupby('round')['vertical'].count().sort_values(ascending=False).head(10)
-        st.subheader('Best Funding Type')
-        fig9, ax9 = plt.subplots(figsize =(15,9))
-        ax9.bar(rounds_count.index, rounds_count.values)
-        ax9.set_xlabel('Funding Types')
-        ax9.set_ylabel('Number of startups')
+    plt.xticks(rotation=45,ha='right')
+    plt.tight_layout()
 
-        plt.xticks(rotation=45,ha='right')
-        plt.tight_layout()
+    st.pyplot(fig9)
 
-        st.pyplot(fig9)
 
-    with col2:
-        rounds_sum = df.groupby('round')['amount'].sum().sort_values(ascending=False).head(10)
-        st.subheader('Best Funding level of amount')
-        fig10, ax10 = plt.subplots(figsize=(15, 9))
-        ax10.bar(rounds_sum.index, rounds_sum.values)
-        ax10.set_xlabel('Funding Types')
-        ax10.set_ylabel('amount of invest')
+    rounds_sum = df.groupby('round')['amount'].sum().sort_values(ascending=False).head(10)
+    st.subheader('Best Funding level of amount')
+    fig10, ax10 = plt.subplots(figsize=(15, 9))
+    ax10.barh(rounds_sum.index, rounds_sum.values,color='pink')
+    ax10.set_xlabel('Funding Types')
+    ax10.set_ylabel('amount of invest')
 
-        plt.xticks(rotation=45, ha='right')
-        plt.tight_layout()
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
 
-        st.pyplot(fig10)
+    st.pyplot(fig10)
 
-    st.header('analysis basic on the city')
-    col1, col2 = st.columns(2)
-    with col1:
-        city_count = df.groupby('city')['startup'].count().sort_values(ascending=False).head(10)
-        st.subheader('Best city for startups')
-        fig11, ax11 = plt.subplots(figsize=(15, 9))
-        ax11.bar(city_count.index, city_count.values)
-        ax11.set_xlabel('city name')
-        ax11.set_ylabel('no of startups')
+    st.header('Geographical Insights')
+    st.subheader('Discover leading startup hubs and their investment acticity')
 
-        plt.xticks(rotation=45, ha='right')
-        plt.tight_layout()
+    city_count = df.groupby('city')['startup'].count().sort_values(ascending=False).head(6)
+    st.subheader('Best city for startups')
+    fig11, ax11 = plt.subplots(figsize=(15, 9))
+    ax11.barh(city_count.index, city_count.values,color='green')
+    ax11.set_xlabel('city name')
+    ax11.set_ylabel('no of startups')
 
-        st.pyplot(fig11)
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
 
-    with col2 :
-        city_sum = df.groupby('city')['amount'].sum().sort_values(ascending=False).head(10)
-        st.subheader('Best city for startups by level of amount')
-        fig12, ax12 = plt.subplots(figsize=(15, 9))
-        ax12.bar(city_sum.index, city_sum.values)
-        ax12.set_xlabel('city name')
-        ax12.set_ylabel('Amount of invest in city')
+    st.pyplot(fig11)
 
-        plt.xticks(rotation=45, ha='right')
-        plt.tight_layout()
 
-        st.pyplot(fig12)
+    city_sum = df.groupby('city')['amount'].sum().sort_values(ascending=False).head(6)
+    st.subheader('Top 6 cities by Total Funding')
+    fig12, ax12 = plt.subplots(figsize=(15, 9))
+    ax12.barh(city_sum.index, city_sum.values,color='green')
+    ax12.set_xlabel('city name')
+    ax12.set_ylabel('Amount of invest in city')
 
-    st.header("Top Investor on the Two Basis")
-    col1, col2 = st.columns(2)
-    with col1:
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
 
-        investor_count = df.groupby('investors')['startup'].count().sort_values(ascending=False).head(10)
-        st.subheader('Top investors basic of numbers')
-        fig12, ax12 = plt.subplots(figsize=(15, 9))
-        ax12.bar(investor_count.index, investor_count.values)
-        ax12.set_xlabel('investor name')
-        ax12.set_ylabel('no of startups invest')
+    st.pyplot(fig12)
 
-        plt.xticks(rotation=45, ha='right')
-        plt.tight_layout()
+    st.header("Investors Perforamance Analysis")
 
-        st.pyplot(fig12)
 
-    with col2:
+    investor_count = df.groupby('investors')['startup'].count().sort_values(ascending=False).head(10)
+    st.subheader('Top 10 Investors by Number of Investments')
+    fig12, ax12 = plt.subplots(figsize=(15, 9))
+    ax12.bar(investor_count.index, investor_count.values)
+    ax12.set_xlabel('investor name')
+    ax12.set_ylabel('no of startups invest')
 
-        investor_sum = df.groupby('investors')['amount'].sum().sort_values(ascending=False).head(10)
-        st.subheader('Top investors basic on the amount')
-        fig12, ax12 = plt.subplots(figsize=(15, 9))
-        ax12.bar(investor_sum.index, investor_sum.values)
-        ax12.set_xlabel('investor name')
-        ax12.set_ylabel('Amount invest in startups')
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
 
-        plt.xticks(rotation=45, ha='right')
-        plt.tight_layout()
+    st.pyplot(fig12)
 
-        st.pyplot(fig12)
+
+
+    investor_sum = df.groupby('investors')['amount'].sum().sort_values(ascending=False).head(10)
+    st.subheader('Top Investor By Total Funding')
+    fig12, ax12 = plt.subplots(figsize=(15, 9))
+    ax12.bar(investor_sum.index, investor_sum.values)
+    ax12.set_xlabel('investor name')
+    ax12.set_ylabel('Amount invest in startups')
+
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+
+    st.pyplot(fig12)
 
     st.header('Top startups Year wise')
     selected_year = st.selectbox('select Type', [2015,2016,2017,2018,2019,2020])
-    st.subheader('for find top 5 best startups')
+    st.subheader('Top 10 startups this year')
     def year_best_st(selected_year):
         year_wise_best =  df[df['year'] == selected_year][['startup', 'amount']].sort_values(by='amount', ascending=False).head(10)
 
         return st.dataframe(year_wise_best)
     year_best_st(selected_year)
 
-    st.subheader('all money invest in this year')
+    st.subheader('Total money invested in this year')
 
     def year_best_st1(selected_year):
         Total_amount = round(df[df['year'] == selected_year][['startup', 'amount']]['amount'].sum())
