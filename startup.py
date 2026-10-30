@@ -196,33 +196,13 @@ def load_startup_details(startup):
     st.dataframe(last5_df)
 
     st.header('similar companies')
-    option1 = st.selectbox('select one',['city','amount'])
 
-    if option1 == 'city':
-        selected_city = st.selectbox('select one city', sorted(df['city'].unique().tolist()))
-        load_similar_city(selected_city)
+    vertical = df[df['startup'].str.contains(startup)][['vertical', 'amount', 'city']].iloc[0]['vertical']
+    amount = df[df['startup'].str.contains(startup)][['vertical', 'amount', 'city']].iloc[0]['amount']
+    city = df[df['startup'].str.contains(startup)][['vertical', 'amount', 'city']].iloc[0]['city']
 
-    if option1 == 'amount':
-        st.title('similar company basis on amount')
-        range_amount = st.selectbox('select one range',['1-5','5-20','20-100','100-1000'])
-        lower_range_amount = int(range_amount.split('-')[0])
-        upper_range_amount = int(range_amount.split('-')[1])
-        load_amount_basis(lower_range_amount,upper_range_amount)
-
-
-def load_amount_basis(lower_range_amount,upper_range_amount):
-    st.subheader('similar companies')
-    load5 = df[(df['amount'] >= lower_range_amount) & (df['amount'] <= upper_range_amount)][['date', 'startup', 'vertical', 'city', 'investors', 'round', 'amount']].head(5)
-    st.dataframe(load5)
-
-
-
-def load_similar_city(city):
-    st.title(city)
-    st.subheader('similar companies')
-    load_5 = df[df['city'].str.contains(city)].head(5)[['round', 'amount', 'startup', 'date', 'investors', 'vertical']]
-    st.dataframe(load_5)
-
+    data = df[(df['vertical'] == vertical) & (df['amount'].between(amount*0.8 , amount*2.6)) & (df['city'] == city) & (df['startup'] != startup)].head()
+    st.dataframe(data)
 
 def load_investor_details(investor):
     st.title(investor)
