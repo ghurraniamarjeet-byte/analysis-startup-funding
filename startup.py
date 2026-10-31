@@ -1,4 +1,5 @@
 import streamlit as st
+from matplotlib.ticker import MaxNLocator
 if "show_details" not in st.session_state:
     st.session_state.show_details = False
 st.set_page_config(layout="wide")
@@ -207,54 +208,58 @@ def load_startup_details(startup):
 def load_investor_details(investor):
     st.title(investor)
     #load the recent 5 investments of the investor
-    last5_df = df[df['investors'].str.contains(investor)].head()[['date', 'startup', 'vertical', 'city', 'round', 'amount']]
-    st.subheader('most five investments')
+    last5_df = df[df['investors'].str.contains(investor)].head(10)[['date', 'startup', 'vertical', 'city', 'round', 'amount']]
+    st.subheader('Recent Investments')
     st.dataframe(last5_df)
+
+    big_series = df[df['investors'].str.contains(investor)].groupby('startup')['amount'].sum().sort_values(
+        ascending=False).head()
+    st.subheader('Biggest investments')
+    st.dataframe(big_series)
 
 
     col1, col2 = st.columns(2)
     with col1:
-        # load the biggest top 5 investments
-        big_series = df[df['investors'].str.contains(investor)].groupby('startup')['amount'].sum().sort_values(ascending=False).head()
-        st.subheader('top five biggest investments')
-        st.dataframe(big_series)
         #made a graph of big investments
         st.subheader('Biggest investments')
-        fig, ax = plt.subplots()
-        ax.bar(big_series.index, big_series.values)
+        fig, ax = plt.subplots(figsize=(5,5))
+        ax.bar(big_series.index, big_series.values,color='red')
 
-        st.pyplot(fig)
+        st.pyplot(fig,use_container_width=True)
     with col2:
-        st.subheader('pi chart for sector investments')
+        st.subheader('Sector Analysis')
         vertical = df[df['investors'].str.contains(investor)].groupby('vertical')['amount'].sum()
 
-        fig1, ax1 = plt.subplots()
+        fig1, ax1 = plt.subplots(figsize=(11,11))
         ax1.pie(vertical,labels=vertical.index,autopct='%1.1f%%')
 
-        st.pyplot(fig1)
+        st.pyplot(fig1,use_container_width=True)
 
     col3,col4 = st.columns(2)
     with col3:
-        st.subheader('pi chart for stage investments')
+        st.subheader('Stage Analysis')
         rounds = df[df['investors'].str.contains(investor)].groupby('round')['amount'].sum()
 
-        fig2, ax2 = plt.subplots()
+        fig2, ax2 = plt.subplots(figsize=(9,9))
         ax2.pie(rounds, labels=rounds.index, autopct='%1.1f%%')
 
         st.pyplot(fig2)
 
     with col4:
-        st.subheader('pi chart for city')
+        st.subheader('City Analysis')
         city = df[df['investors'].str.contains(investor)].groupby('city')['amount'].sum()
 
-        fig3, ax3 = plt.subplots()
+        fig3, ax3 = plt.subplots(figsize=(6,6))
         ax3.pie(city, labels=city.index, autopct='%1.1f%%')
+        st.pyplot(fig3)
 
-    st.subheader('yoy graph for every investments')
+    st.subheader('yoy investments Analysis')
     df['year'] = df['date'].dt.year
     year = df[df['investors'].str.contains(investor)].groupby('year')['amount'].sum()
     fig4, ax4 = plt.subplots()
+    ax4.xaxis.set_major_locator(MaxNLocator(integer=True))
     ax4.plot(year.index, year.values)
+
     st.pyplot(fig4)
 
 
